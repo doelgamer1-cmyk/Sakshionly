@@ -1,1 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>THE VAULT</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Montserrat:wght@400;800&display=swap');
+
+        body, html { 
+            margin: 0; padding: 0; width: 100%; height: 100%; 
+            background: #000; font-family: 'Montserrat', sans-serif;
+            color: #c5a059; overflow: hidden; position: fixed;
+        }
+
+        #ui-gate {
+            position: fixed; inset: 0; z-index: 999; background: #000;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+        }
+
+        .init-btn {
+            padding: 20px 40px; border: 2px solid #c5a059; background: transparent;
+            color: #c5a059; font-family: 'Cinzel', serif; font-size: 1.1rem;
+            letter-spacing: 5px; cursor: pointer; transition: 0.3s;
+        }
+
+        #stage {
+            width: 100%; height: 100%; display: flex; align-items: center; 
+            justify-content: center; perspective: 1200px; opacity: 0; transition: 1s;
+        }
+
+        #letter {
+            width: 85%; max-width: 320px; height: 480px; background: #050505;
+            border: 1px solid #c5a059; padding: 35px; border-radius: 4px;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            text-align: center; transform: translateZ(-600px) rotateX(90deg);
+            transition: transform 1.2s cubic-bezier(0.19, 1, 0.22, 1);
+            box-shadow: 0 0 50px rgba(197, 160, 89, 0.1);
+        }
+
+        /* Paradox HUD - Massive Visibility */
+        #math-hud {
+            position: fixed; inset: 0; background: #000;
+            z-index: 1001; display: none; flex-direction: column; 
+            align-items: center; justify-content: center; padding: 30px;
+        }
+
+        .math-text { 
+            font-size: 1.8rem; font-weight: 800; text-align: center; color: #c5a059;
+            text-shadow: 0 0 25px rgba(197, 160, 89, 0.8);
+            animation: shimmer 2s infinite linear;
+            line-height: 1.4;
+        }
+
+        #loading-bar {
+            width: 200px; height: 2px; background: #222; margin-top: 40px;
+            position: relative; overflow: hidden;
+        }
+        #loading-progress {
+            width: 0%; height: 100%; background: #c5a059;
+            transition: width 3s linear;
+        }
+
+        @keyframes shimmer {
+            0% { opacity: 0.8; transform: scale(0.98); }
+            50% { opacity: 1; transform: scale(1); }
+            100% { opacity: 0.8; transform: scale(0.98); }
+        }
+
+        .btn-choice {
+            margin: 15px; padding: 15px 35px; background: none; 
+            border: 1px solid #c5a059; color: #c5a059; font-family: 'Cinzel';
+            cursor: pointer; font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="ui-gate">
+        <button class="init-btn" onclick="openVault()">AUTHORIZE</button>
+    </div>
+
+    <div id="stage">
+        <p style="position:fixed; top:12%; letter-spacing:4px; font-size:0.6rem; color:#666;">ORIENTATION LOCK: FLIP PHONE</p>
+        <div id="letter">
+            <h1 style="font-family:'Cinzel'; font-size:1.8rem; margin-bottom:10px;">BE MY VALENTINE?</h1>
+            <p style="font-size:0.7rem; color:#444; margin-bottom:40px;">(Choose wisely, logic is watching)</p>
+            <button class="btn-choice" onclick="celebrate('Standard logic accepted.')">YES</button>
+            <button class="btn-choice" id="no-btn" onclick="runParadox()">NO</button>
+        </div>
+    </div>
+
+    <div id="math-hud">
+        <div id="math-display" class="math-text"></div>
+        <div id="loading-bar"><div id="loading-progress"></div></div>
+        <p style="margin-top:20px; font-size:0.6rem; letter-spacing:3px; color:#444;">RECALCULATING REALITY...</p>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <script>
+        let isActive = false;
+        let isRevealed = false;
+
+        async function openVault() {
+            if (typeof DeviceOrientationEvent.requestPermission === 'function') {
+                const res = await DeviceOrientationEvent.requestPermission();
+                if (res === 'granted') proceed();
+            } else { proceed(); }
+        }
+
+        function proceed() {
+            document.getElementById('ui-gate').style.display = 'none';
+            document.getElementById('stage').style.opacity = '1';
+            isActive = true;
+            window.addEventListener('deviceorientation', (e) => {
+                if(isActive && !isRevealed && Math.abs(e.beta) > 150) {
+                    isRevealed = true;
+                    document.getElementById('letter').style.transform = "translateZ(0) rotateX(0deg)";
+                }
+            });
+        }
+
+        function runParadox() {
+            const hud = document.getElementById('math-hud');
+            const display = document.getElementById('math-display');
+            const progress = document.getElementById('loading-progress');
+            hud.style.display = 'flex';
+            
+            const equations = [
+                "Selection: 'NO'<br>Status: ILLOGICAL",
+                "lim (x → ∞) No = YES",
+                "∫(You + Me) = 1 (YES)",
+                "No ÷ 0 = ERROR<br>REWRITING...",
+                "NO ≡ YES",
+                "Q.E.D.<br>Resistance is Futile."
+            ];
+
+            let i = 0;
+            function showNext() {
+                if (i < equations.length) {
+                    display.innerHTML = equations[i];
+                    progress.style.width = '0%';
+                    setTimeout(() => { progress.style.width = '100%'; }, 50);
+                    
+                    i++;
+                    setTimeout(showNext, 3200); // 3.2 seconds per equation
+                } else {
+                    hud.style.display = 'none';
+                    celebrate("The math doesn't lie, and neither do I.");
+                }
+            }
+            showNext();
+        }
+
+        function celebrate(msg) {
+            const card = document.getElementById('letter');
+            card.style.background = '#c5a059';
+            card.style.color = '#000';
+            card.innerHTML = `<h1 style="font-family:'Cinzel'">LOCKED IN</h1><p style="font-weight:800">${msg}</p><div style="font-size:3rem">⚜️</div>`;
+            card.style.transform = "translateZ(0) rotateX(0deg)"; 
+            
+            confetti({
+                particleCount: 400, spread: 150, origin: { y: 0.6 },
+                colors: ['#c5a059', '#ffffff', '#000000']
+            });
+        }
+    </script>
+</body>
+</html>
 
