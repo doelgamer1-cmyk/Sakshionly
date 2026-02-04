@@ -29,6 +29,14 @@
             justify-content: center; perspective: 1200px; opacity: 0; transition: 1s;
         }
 
+        /* Your specific request: Hata diya ji */
+        #hata-text {
+            position: fixed; top: 10%; width: 100%; text-align: center;
+            font-family: 'Cinzel', serif; font-size: 1.8rem; letter-spacing: 2px;
+            color: #c5a059; text-shadow: 0 0 15px rgba(197, 160, 89, 0.6);
+            animation: fadeInOut 2s ease-in-out;
+        }
+
         #letter {
             width: 85%; max-width: 320px; height: 480px; background: #050505;
             border: 1px solid #c5a059; padding: 35px; border-radius: 4px;
@@ -38,7 +46,6 @@
             box-shadow: 0 0 50px rgba(197, 160, 89, 0.1);
         }
 
-        /* Paradox HUD - Massive Visibility */
         #math-hud {
             position: fixed; inset: 0; background: #000;
             z-index: 1001; display: none; flex-direction: column; 
@@ -67,6 +74,11 @@
             100% { opacity: 0.8; transform: scale(0.98); }
         }
 
+        @keyframes fadeInOut {
+            0% { opacity: 0; transform: translateY(-20px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+
         .btn-choice {
             margin: 15px; padding: 15px 35px; background: none; 
             border: 1px solid #c5a059; color: #c5a059; font-family: 'Cinzel';
@@ -77,11 +89,11 @@
 <body>
 
     <div id="ui-gate">
-        <button class="init-btn" onclick="openVault()">AUTHORIZE</button>
+        <button class="init-btn" onclick="proceed()">AUTHORIZE</button>
     </div>
 
     <div id="stage">
-        <p style="position:fixed; top:12%; letter-spacing:4px; font-size:0.6rem; color:#666;">ORIENTATION LOCK: FLIP PHONE</p>
+        <div id="hata-text">HATA DIYA JI ✨</div>
         <div id="letter">
             <h1 style="font-family:'Cinzel'; font-size:1.8rem; margin-bottom:10px;">BE MY VALENTINE?</h1>
             <p style="font-size:0.7rem; color:#444; margin-bottom:40px;">(Choose wisely, logic is watching)</p>
@@ -98,26 +110,16 @@
 
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <script>
-        let isActive = false;
-        let isRevealed = false;
-
-        async function openVault() {
-            if (typeof DeviceOrientationEvent.requestPermission === 'function') {
-                const res = await DeviceOrientationEvent.requestPermission();
-                if (res === 'granted') proceed();
-            } else { proceed(); }
-        }
-
         function proceed() {
-            document.getElementById('ui-gate').style.display = 'none';
-            document.getElementById('stage').style.opacity = '1';
-            isActive = true;
-            window.addEventListener('deviceorientation', (e) => {
-                if(isActive && !isRevealed && Math.abs(e.beta) > 150) {
-                    isRevealed = true;
+            document.getElementById('ui-gate').style.opacity = '0';
+            setTimeout(() => {
+                document.getElementById('ui-gate').style.display = 'none';
+                const stage = document.getElementById('stage');
+                stage.style.opacity = '1';
+                setTimeout(() => {
                     document.getElementById('letter').style.transform = "translateZ(0) rotateX(0deg)";
-                }
-            });
+                }, 100);
+            }, 500);
         }
 
         function runParadox() {
@@ -141,9 +143,8 @@
                     display.innerHTML = equations[i];
                     progress.style.width = '0%';
                     setTimeout(() => { progress.style.width = '100%'; }, 50);
-                    
                     i++;
-                    setTimeout(showNext, 3200); // 3.2 seconds per equation
+                    setTimeout(showNext, 3200); 
                 } else {
                     hud.style.display = 'none';
                     celebrate("The math doesn't lie, and neither do I.");
@@ -167,4 +168,3 @@
     </script>
 </body>
 </html>
-
